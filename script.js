@@ -9,7 +9,52 @@ document.addEventListener('DOMContentLoaded', () => {
     initHeroCanvas();
     initMatrixCanvas();
     initMobileNav();
+    initPassword();
 });
+
+/* ---------- PASSWORD PROTECTION ---------- */
+function initPassword() {
+    const overlay = document.getElementById('password-overlay');
+    const form = document.getElementById('password-form');
+    const input = document.getElementById('password-input');
+    const errorMsg = document.getElementById('password-error');
+
+    // Check session storage
+    if (sessionStorage.getItem('authenticated') === 'true') {
+        overlay.style.display = 'none';
+        return;
+    } else {
+        document.body.classList.add('password-active');
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const password = input.value;
+
+        if (password === 'mustafa') {
+            sessionStorage.setItem('authenticated', 'true');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.classList.remove('password-active');
+                
+                // Trigger animations that might have been missed
+                const reveals = document.querySelectorAll('.reveal');
+                reveals.forEach(el => el.classList.add('active'));
+            }, 500);
+        } else {
+            errorMsg.textContent = 'Hatalı şifre. Tekrar deneyin.';
+            input.value = '';
+            input.focus();
+            
+            // Simple shake effect via CSS transform manually if needed, or just text
+            input.style.borderColor = 'var(--red)';
+            setTimeout(() => {
+                input.style.borderColor = 'var(--border-color)';
+            }, 500);
+        }
+    });
+}
 
 /* ---------- NAVBAR ---------- */
 function initNavbar() {
